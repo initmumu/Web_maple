@@ -5,15 +5,23 @@ class Pos{
     }
 }
 
+class Inertial{
+    constructor(){
+        this.dx = 0;
+    }
+}
+
 class Char{
     constructor(){
         this.pos = new Pos();
+        this.inertial = new Inertial();
 
         this.img = new Image();
         this.img.src = "./image/temp/rightStandChar0.gif"
 
         this.seeing = "right"
-        this.motion = "Rstand0"
+        this.prevMotion = 0
+        this.motion = 0
     }
 }
 
@@ -24,90 +32,157 @@ class Background{
     }
 }
 
-
 let bg = new Background();
 let myChar = new Char();
-
-var canvas; //도화지 객체
-var context; //화가 객체
-
-
-// 플레이어 이동 방향과 속도
-var dx=0;
-var dy=0;
 
 // 키 이벤트로 인해 인식된 keycode변수
 var keycode;
 
-let standTimer = 0;
+let canvas = document.getElementById('c1');
+let context = canvas.getContext('2d');
+
+let timer = 0;
+let jumpTimer = 1;
+let jumping = false
+
 function loaded(){
-    canvas= document.getElementById('c1');
-    context= canvas.getContext('2d');
-
-    runGame(); //게임을 진행하는 함수
-    //10ms 마다 runGame()를 다시 호출
-    setInterval(runGame,10); //1초에 100번 호출
+    // 프레임 단위로 loaded 함수 호출
+    requestAnimationFrame(loaded)
     
+    // 프레임 타이머
+    timer++
+
+    jump()
+    charMoveX()
+    charMotionLoad()
+    drawAll()
 }
 
-function runGame(){
-    standTimer += 1;
-    if(standTimer % 50 == 0){
-        console.log(myChar.img.src)
-        charStandMotion();
+function charMoveX(){
+    myChar.pos.x += myChar.inertial.dx
+}
+
+function jump(){
+    if(jumping){
+        myChar.pos.y -= 3;
+        jumpTimer++;
     }
-    moveAll(); //캐릭터 움직이기
-    charGravity();
-    drawAll(); // 이미지들 그리기
+    else{
+        if(myChar.pos.y < 300){
+            myChar.pos.y += 3;
+        }
+        else if(myChar.motion == 20){
+            myChar.motion = myChar.prevMotion;
+            charStandMotion()
+        }
+    }
+    if(jumpTimer > 15){
+        jumping = false;
+    }
 }
 
-function moveAll(){
-    //플레이어의 좌표 변경
-    myChar.pos.x+=dx;
-    myChar.pos.y+=dy;
+function charMotionLoad(){
 
+    if(myChar.motion < 10){
+        if(timer % 50 == 0){
+            charStandMotion();
+        }
+    }
+
+    else if(myChar.motion < 20){
+        if(timer % 12 == 0){
+            charWalkingMotion()
+        }
+    }
+
+    else if(myChar.motion == 20){
+        charJumpMotion()
+    }
 }
 
-function charGravity(){
-    if(myChar.pos.y < 300)
-        myChar.pos.y += 3
+function charJumpMotion(){
+    if(myChar.seeing == "right"){
+        myChar.img.src = "./image/temp/rightJumpChar.gif"
+    }
+    else if(myChar.seeing == "left"){
+        myChar.img.src = "./image/temp/leftJumpChar.gif"
+    }
 }
 
 function charStandMotion(){
     if(myChar.seeing == "right"){
-        if(myChar.motion == "stand0"){
+        if(myChar.motion == 0){
             myChar.img.src = "./image/temp/rightStandChar1.gif"
-            myChar.motion = "stand1"
+            myChar.motion = 1
         }
-        else if(myChar.motion == "stand1"){
+        else if(myChar.motion == 1){
             myChar.img.src = "./image/temp/rightStandChar2.gif"
-            myChar.motion = "stand2"
+            myChar.motion = 2
         }
-        else if(myChar.motion == "stand2"){
+        else if(myChar.motion == 2){
             myChar.img.src = "./image/temp/rightStandChar3.gif"
-            myChar.motion = "stand3"
+            myChar.motion = 3
         }
-        else if(myChar.motion == "stand3"){
+        else if(myChar.motion == 3){
             myChar.img.src = "./image/temp/rightStandChar0.gif"
-            myChar.motion = "stand0"
+            myChar.motion = 0
         }
     }
     else if(myChar.seeing == "left"){
-        if(myChar.motion == "stand0"){
+        if(myChar.motion == 0){
             myChar.img.src = "./image/temp/leftStandChar1.gif"
-            myChar.motion = "stand1"
+            myChar.motion = 1
         }
-        else if(myChar.motion == "stand1"){
+        else if(myChar.motion == 1){
             myChar.img.src = "./image/temp/leftStandChar2.gif"
-            myChar.motion = "stand2"
+            myChar.motion = 2
         }
-        else if(myChar.motion == "stand2"){
+        else if(myChar.motion == 2){
             myChar.img.src = "./image/temp/leftStandChar3.gif"
-            myChar.motion = "stand3"
+            myChar.motion = 3
         }
-        else if(myChar.motion == "stand3"){
+        else if(myChar.motion == 3){
             myChar.img.src = "./image/temp/leftStandChar0.gif"
-            myChar.motion = "stand0"
+            myChar.motion = 0
+        }
+    }
+}
+
+function charWalkingMotion(){
+    if(myChar.seeing == "left"){
+        if(myChar.motion == 10){
+            myChar.img.src = "./image/temp/leftWalkingChar1.gif"
+            myChar.motion = 11
+        }
+        else if(myChar.motion == 11){
+            myChar.img.src = "./image/temp/leftWalkingChar2.gif"
+            myChar.motion = 12
+        }
+        else if(myChar.motion == 12){
+            myChar.img.src = "./image/temp/leftWalkingChar3.gif"
+            myChar.motion = 13
+        }
+        else if(myChar.motion == 13){
+            myChar.img.src = "./image/temp/leftWalkingChar0.gif"
+            myChar.motion = 10
+        }
+    }
+    else if(myChar.seeing == "right"){
+        if(myChar.motion == 10){
+            myChar.img.src = "./image/temp/rightWalkingChar1.gif"
+            myChar.motion = 11
+        }
+        else if(myChar.motion == 11){
+            myChar.img.src = "./image/temp/rightWalkingChar2.gif"
+            myChar.motion = 12
+        }
+        else if(myChar.motion == 12){
+            myChar.img.src = "./image/temp/rightWalkingChar3.gif"
+            myChar.motion = 13
+        }
+        else if(myChar.motion == 13){
+            myChar.img.src = "./image/temp/rightWalkingChar0.gif"
+            myChar.motion = 10
         }
     }
 }
@@ -117,29 +192,28 @@ function drawAll(){
     context.drawImage(bg.img,0,0);
     //플레이어 그리기
     context.drawImage(myChar.img, myChar.pos.x, myChar.pos.y, 55, 73);
-
-    // 키 코드값 글씨 그리기
-    /*
-    context.fillStyle="white";
-    context.font="30px sans-serif";
-    context.fillText(keycode, 10, 40);
-    */
 }
 
 function keydown(){
     //눌러진 key의 코드값
     keycode=event.keyCode;
     switch(keycode){
-        case 37: 
-            dx=-1;
+        case 37: // left
             myChar.seeing = "left"
-            break; //left
-        case 38: dy=-1; break; //up
-        case 39: 
-            dx=1;             
-            myChar.seeing = "right"
+            if(myChar.motion < 10){
+                myChar.motion = 10
+                myChar.img.src = "./image/temp/leftWalkingChar0.gif"
+                myChar.inertial.dx = -3;
+            }
+            break;
+        case 39:
+            myChar.seeing = "right";
+            if(myChar.motion < 10){
+                myChar.motion = 10
+                myChar.img.src = "./image/temp/rightWalkingChar0.gif"
+                myChar.inertial.dx = 3;
+            }
             break; //right
-        case 40: dy=1; break; //down
     }
 }
 
@@ -147,12 +221,25 @@ function keyup(){
     //떨어진 key의 코드값
     keycode=event.keyCode;
     switch(keycode){
-        case 37: 
-        case 39:
-            dx=0;
-            myChar.motion = "stand0"
-            break; // right
-        case 38:
-        case 40: dy=0; break;
+        case 37: // left
+            myChar.motion = 0
+            myChar.inertial.dx = 0;
+            myChar.img.src = "./image/temp/leftStandChar0.gif"
+            break;
+        case 39: // right
+            myChar.motion = 0
+            myChar.inertial.dx = 0;
+            myChar.img.src = "./image/temp/rightStandChar0.gif"
+            break;
     }
 }
+
+
+document.addEventListener('keyup', function(e){
+    if(e.keyCode === 32){
+        myChar.prevMotion = myChar.motion
+        myChar.motion = 20 // 점프코드
+        jumping = true
+        jumpTimer = 1;
+    }
+})

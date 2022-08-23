@@ -10,9 +10,10 @@ class Char{
         this.pos = new Pos();
 
         this.img = new Image();
-        this.img.src = "./image/char/leftStandChar.png"
+        this.img.src = "./image/temp/rightStandChar0.gif"
 
-        this.motion = "stand0"
+        this.seeing = "right"
+        this.motion = "Rstand0"
     }
 }
 
@@ -73,21 +74,41 @@ function charGravity(){
 }
 
 function charStandMotion(){
-    if(myChar.motion == "stand0"){
-        myChar.img.src = "./image/char/leftStandChar1.png"
-        myChar.motion = "stand1"
+    if(myChar.seeing == "right"){
+        if(myChar.motion == "stand0"){
+            myChar.img.src = "./image/temp/rightStandChar1.gif"
+            myChar.motion = "stand1"
+        }
+        else if(myChar.motion == "stand1"){
+            myChar.img.src = "./image/temp/rightStandChar2.gif"
+            myChar.motion = "stand2"
+        }
+        else if(myChar.motion == "stand2"){
+            myChar.img.src = "./image/temp/rightStandChar3.gif"
+            myChar.motion = "stand3"
+        }
+        else if(myChar.motion == "stand3"){
+            myChar.img.src = "./image/temp/rightStandChar0.gif"
+            myChar.motion = "stand0"
+        }
     }
-    else if(myChar.motion == "stand1"){
-        myChar.img.src = "./image/char/leftStandChar2.png"
-        myChar.motion = "stand2"
-    }
-    else if(myChar.motion == "stand2"){
-        myChar.img.src = "./image/char/leftStandChar1.png"
-        myChar.motion = "stand3"
-    }
-    else if(myChar.motion == "stand3"){
-        myChar.img.src = "./image/char/leftStandChar.png"
-        myChar.motion = "stand0"
+    else if(myChar.seeing == "left"){
+        if(myChar.motion == "stand0"){
+            myChar.img.src = "./image/temp/leftStandChar1.gif"
+            myChar.motion = "stand1"
+        }
+        else if(myChar.motion == "stand1"){
+            myChar.img.src = "./image/temp/leftStandChar2.gif"
+            myChar.motion = "stand2"
+        }
+        else if(myChar.motion == "stand2"){
+            myChar.img.src = "./image/temp/leftStandChar3.gif"
+            myChar.motion = "stand3"
+        }
+        else if(myChar.motion == "stand3"){
+            myChar.img.src = "./image/temp/leftStandChar0.gif"
+            myChar.motion = "stand0"
+        }
     }
 }
 
@@ -111,12 +132,12 @@ function keydown(){
     switch(keycode){
         case 37: 
             dx=-1;
-            myChar.img.src = "./image/char/leftStandChar.png"
+            myChar.seeing = "left"
             break; //left
         case 38: dy=-1; break; //up
         case 39: 
             dx=1;             
-            myChar.img.src = "./image/char/rightStandChar.png"
+            myChar.seeing = "right"
             break; //right
         case 40: dy=1; break; //down
     }
@@ -127,7 +148,10 @@ function keyup(){
     keycode=event.keyCode;
     switch(keycode){
         case 37: 
-        case 39: dx=0; break;
+        case 39:
+            dx=0;
+            myChar.motion = "stand0"
+            break; // right
         case 38:
         case 40: dy=0; break;
     }
